@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">陆龟所</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="temperature">温度显示</string>
+    <string name="title_activity_wifi">WifiActivity</string>
+    <string name="wifi_btn">新增</string>
+    <string name="conn_btn">连接</string>
+    <string name="login_btn">登录</string>
+    <string name="close_btn">断开</string>
+    <string name="debug_btn">调试</string>
+    <string name="c50w_on">陶瓷50W(开)</string>
+    <string name="c50w_off">陶瓷50W(关)</string>
+    <string name="uva_on">UVA(开)</string>
+    <string name="uva_off">UVA(关)</string>
+    <string name="uvb_on">UVB(开)</string>
+    <string name="uvb_off">UVB(关)</string>
+    <string name="c75w_on">陶瓷75W(开)</string>
+    <string name="c75w_off">陶瓷75W(关)</string>
+    <string name="hmdf_on">加湿机(开)</string>
+    <string name="hmdf_off">加湿机(关)</string>
+    <string name="fan_speed">风扇速度</string>
+    <string name="aimh">目标湿度</string>
+    <string name="aimt">目标温度</string>
+    
+<!--     <string name="warm_up">加热(打开)</string>
+    <string name="warm_off">加热(关闭)</string>
+    <string name="cold_down">制冷(打开)</string>
+    <string name="cold_off">制冷(关闭)</string> -->
+
+    <string name="lookup">寻找模块</string>
+    <string name="join">连接模块</string>
+    <string name="setup">设置模块</string>
+    <string name="upload">上传Server</string>
+    <string name="connect">连接wifi</string>
+    <string name="opensta">模块STA</string>
+    <string name="changewifi">更换Wifi</string>
+    <string name="openap">打开AP</string>
+    <string name="scan">扫描网络</string>
+    <string name="start">打开Wifi</string>
+    <string name="stop">关闭Wifi</string>
+    <string name="check">Wifi状态</string>
+    <string name="ssid">wifi的SSID</string>
+    <string name="pwd">请输入wifi密码</string>
+    <string name="rtn">返回</string>
+    <string name="status">当前没有连接Wifi网络</string>
+    <string name="oper_hint">操作提示</string>
+    
+    
+    <string name="title_login_dialog">登录设置(v160126_1435)</string>
+    <string name="title_deploy_dialog">实时操控</string>
+    <string name="title_unlocktime">解锁时长(秒)</string>
+    <string name="dialog_conntype">协议</string>
+    <string name="dialog_conntype_hint">Only TCP</string>
+    <string name="dialog_hostip">服务器</string>
+    <string name="dialog_hostip_hint">58.64.167.178</string>
+    <string name="dialog_tcpport">TCP端口</string>
+    <string name="dialog_tcpport_hint">TCP:8013</string>
+    <string name="dialog_udpport">UDP端口</string>
+    <string name="dialog_udpport_hint">UDP:8001</string>
+    <string name="dialog_name">用户名</string>
+    <string name="dialog_name_hint">有效的手机号或电子邮箱</string>
+    <string name="dialog_sqlite">sqlite</string>
+    <string name="dialog_chart">chart</string>
+    <string name="dialog_new">新增</string>
+    <string name="dialog_register">注册</string>
+    <string name="dialog_pwd">密码</string>
+    <string name="dialog_pwd_hint">最长10位(字母/数字/特殊字符均可)</string>
+    <string name="dialog_cancel">取消</string>
+    <string name="dialog_ok">好</string>
+    
+    <string name="title_register_dialog">注册用户</string>
+    <string name="dialog_r_debug">DEBUG</string>
+    <string name="dialog_r_user_name">用户名</string>
+    <string name="dialog_r_nick_name">昵称</string>
+    <string name="dialog_r_password">密码</string>
+    <string name="dialog_r_mobile">手机号</string>
+    <string name="dialog_r_email">电子邮箱</string>
+    <string name="dialog_r_user_name_hint">用户名(可用于登录)中英文和数字</string>
+    <string name="dialog_r_nick_name_hint">昵称，中英文和数字</string>
+<!--     <string name="dialog_r_password_hint">密码</string> -->
+    <string name="dialog_r_mobile_hint">手机号</string>
+    <string name="dialog_r_getSMS">获取</string>
+    <string name="dialog_r_identify_num_hint">验证码</string>
+    <string name="dialog_r_email_hint">电子邮箱</string>
+
+    <string name="title_aimsetting_dialog">温湿度目标设置</string>
+    
+    <string name="module_name">模块名</string>
+    <string name="status_snap">水温:24.0;空气温度:27.00;湿度80%</string>
+</resources>
