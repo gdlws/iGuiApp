@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="65dp" >
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="60dip"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:padding="10dip"
+            android:text="@string/title_register_dialog"
+            android:textColor="#ff3cac17"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_dialog_debug"
+            android:layout_width="0dip"
+            android:layout_height="50dip"
+            android:layout_marginRight="1dip"
+            android:layout_weight="1"
+            android:background="@drawable/smssdk_dialog_btn_back"
+            android:padding="10dip"
+            android:text="@string/dialog_r_debug"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="#ff3cac17" />
+    <!-- user name -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minEms="6"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:singleLine="true"
+                android:text="@string/dialog_r_user_name"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/et_r_user_name"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/smssdk_input_bg_focus"
+                android:hint="@string/dialog_r_user_name_hint"
+                android:inputType="textCapCharacters"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- nick name -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minEms="6"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:singleLine="true"
+                android:text="@string/dialog_r_nick_name"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/et_r_nick_name"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/smssdk_input_bg_focus"
+                android:hint="@string/dialog_r_nick_name_hint"
+                android:inputType="textCapCharacters"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- password -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minEms="6"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:singleLine="true"
+                android:text="@string/dialog_r_password"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/et_r_password"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/smssdk_input_bg_focus"
+                android:hint="@string/dialog_pwd_hint"
+                android:inputType="textCapCharacters"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- mobile -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minEms="6"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:singleLine="true"
+                android:text="@string/dialog_r_mobile"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/et_r_mobile"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="1dp"
+                android:layout_weight="3"
+                android:background="@drawable/smssdk_input_bg_focus"
+                android:hint="@string/dialog_r_mobile_hint"
+                android:inputType="number"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+
+            <Button
+                android:id="@+id/btn_dialog_r_getSMS"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@drawable/smssdk_dialog_btn_back"
+                android:text="@string/dialog_r_getSMS"
+                android:textColor="#ff00ff" />
+
+            <EditText
+                android:id="@+id/et_r_identify_num"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="1dp"
+                android:layout_weight="2"
+                android:background="@drawable/smssdk_input_bg_focus"
+                android:hint="@string/dialog_r_identify_num_hint"
+                android:inputType="textCapCharacters"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- email -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="30dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minEms="6"
+                android:paddingLeft="10dip"
+                android:paddingRight="10dip"
+                android:singleLine="true"
+                android:text="@string/dialog_r_email"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+
+            <EditText
+                android:id="@+id/et_r_email"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/smssdk_input_bg_focus"
+                android:hint="@string/dialog_r_email_hint"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"
+                android:textColor="#ffffff"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="#ff737373" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btn_dialog_r_ok"
+            android:layout_width="0dip"
+            android:layout_height="50dip"
+            android:layout_marginLeft="1dip"
+            android:layout_weight="1"
+            android:background="@drawable/smssdk_dialog_btn_back"
+            android:padding="10dip"
+            android:text="@string/dialog_ok"
+            android:textColor="#ffffff" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#ff737373" />
+
+        <Button
+            android:id="@+id/btn_dialog_r_cancel"
+            android:layout_width="0dip"
+            android:layout_height="50dip"
+            android:layout_marginRight="1dip"
+            android:layout_weight="1"
+            android:background="@drawable/smssdk_dialog_btn_back"
+            android:padding="10dip"
+            android:text="@string/dialog_cancel"
+            android:textColor="#ffffff" />
+    </LinearLayout>
+
+</LinearLayout>
