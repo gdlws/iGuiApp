@@ -1,10 +1,5 @@
 package cn.fatdeer.isocket;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
@@ -24,11 +19,11 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
-import cn.fatdeer.isocket.chart.HistoryChartActivity;
 import cn.fatdeer.isocket.chart.iGuiDBHelper;
 import cn.fatdeer.isocket.entity.Module;
 import cn.fatdeer.isocket.pub.Const;
 import cn.fatdeer.isocket.pub.Const.whichActivity;
+import cn.fatdeer.isocket.pub.DoJson;
 
 /**
  * @author GD.lws
@@ -205,51 +200,16 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 					for(int i=0;i<valueNum;i++) {
 						orderStringBuilder.append(modified[i]+",");
 					}
-//					if(btC50W.isChecked()!=mModule.getValue("S1").equals("1")) {
-//						mModule.setStatus("WS1", (btC50W.isChecked()?"1":"0"));
-//						orderStringBuilder.append("SET+S1="+(btC50W.isChecked()?"1 ":"0 "));
-//					}
-//					if(btUVA.isChecked()!=mModule.getValue("S2").equals("1")) {
-//						mModule.setStatus("WS2", (btUVA.isChecked()?"1":"0"));
-//						orderStringBuilder.append("SET+S2="+(btUVA.isChecked()?"1 ":"0 "));
-//					}
-//					if(btUVB.isChecked()!=mModule.getValue("S3").equals("1")) {
-//						mModule.setStatus("WS3", (btUVB.isChecked()?"1":"0"));
-//						orderStringBuilder.append("SET+S3="+(btUVB.isChecked()?"1 ":"0 "));
-//					}
-//					if(btC75W.isChecked()!=mModule.getValue("S4").equals("1")) {
-//						mModule.setStatus("WS4", (btC75W.isChecked()?"1":"0"));
-//						orderStringBuilder.append("SET+S4="+(btC75W.isChecked()?"1 ":"0 "));
-//					}
-//					if(btHMD.isChecked()!=mModule.getValue("S5").equals("1")) {
-//						mModule.setStatus("WS5", (btHMD.isChecked()?"1":"0"));
-//						orderStringBuilder.append("SET+S5="+(btHMD.isChecked()?"1 ":"0 "));
-//					}
-//					if(sbFAN.getProgress()!=Integer.parseInt(mModule.getValue("S6"))) {
-//						mModule.setStatus("WS6", ""+(51*sbFAN.getProgress()));
-//						orderStringBuilder.append("SET+S6="+(51*sbFAN.getProgress())+" ");
-//					}
-//	
-//					if(Integer.parseInt(et_aimh.getText().toString())!=
-//						Integer.parseInt(mModule.getValue("HA"))) {
-//						mModule.setStatus("WHA", et_aimh.getText().toString()); //at 20151214
-//						orderStringBuilder.append("SET+HA="+et_aimh.getText()+" ");
-//					}
-//					if(Integer.parseInt(et_aimt.getText().toString())!=
-//								Integer.parseInt(mModule.getValue("TA"))) {
-//						mModule.setStatus("WTA", et_aimt.getText().toString()); //at 20151214
-//						orderStringBuilder.append("SET+TA="+et_aimt.getText()+" ");
-//					}
-//					orderStringBuilder.append("SET+F=300");
+
 					String orderStr=orderStringBuilder.toString();
 					CLog.i(tag, "orderStr="+orderStr);
-//					if(orderStr.length()>0) { //at 20151203
-//						Const.broadCastToActivity("SUCC", "DEPLOYDIALOG!" + 
-//						DoJson.instance().toJSon("SEND", mName,
-//									mModule.getName(), orderStr), null,mActivity);
+					if(orderStr.length()>0) { //at 20151203
+						Const.broadCastToActivity("SUCC", "AIMSETTINGDIALOG!" + 
+								DoJson.instance().toJSon("USRAIM", mName,
+								mModule.getName(), orderStr), null,mActivity);
 //						mModule.setInOrder(true);
-//						dialog.dismiss();
-//					}
+						dialog.dismiss();
+					}
 				}
 				else {
 					dialog.dismiss();

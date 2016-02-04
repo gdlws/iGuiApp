@@ -33,6 +33,9 @@ import cn.fatdeer.isocket.pub.DoJson;
  *            2. fix the bug of Standard board, except exit ;  
  *           at 20160202
  *            1. new button for expert , open AimSettingDialog; 
+ *           at 20160204
+ *            1. progress of FAN, MAX value change from 5 to 255;
+ *            2. module's values change from String to double;
  */
 public class DeployDialog {
 	private static String tag = DeployDialog.class.getSimpleName();
@@ -62,52 +65,83 @@ public class DeployDialog {
 		final EditText et_aimh = (EditText) dialog.findViewById(R.id.et_aimh); //at 20151203
 		final EditText et_aimt = (EditText) dialog.findViewById(R.id.et_aimt); //at 20151203
 		
-		btC50W.setChecked(mModule.getValue("S1").equals("1"));
-		btUVA.setChecked(mModule.getValue("S2").equals("1"));
-		btUVB.setChecked(mModule.getValue("S3").equals("1"));
-		btC75W.setChecked(mModule.getValue("S4").equals("1"));
-		btHMD.setChecked(mModule.getValue("S5").equals("1"));
-		sbFAN.setProgress(Integer.parseInt(mModule.getValue("S6"))*51);
-		et_aimh.setText(mModule.getValue("HA"));
-		et_aimt.setText(mModule.getValue("TA"));
+//at 20160204
+//		btC50W.setChecked(mModule.getValue("S1").equals("1"));
+//		btUVA.setChecked(mModule.getValue("S2").equals("1"));
+//		btUVB.setChecked(mModule.getValue("S3").equals("1"));
+//		btC75W.setChecked(mModule.getValue("S4").equals("1"));
+//		btHMD.setChecked(mModule.getValue("S5").equals("1"));
+//		sbFAN.setProgress(Integer.parseInt(mModule.getValue("S6"))*51);
+//		et_aimh.setText(mModule.getValue("HA"));
+//		et_aimt.setText(mModule.getValue("TA"));
+		btC50W.setEnabled(mModule.getValue("S1")!=-999);
+		btUVA.setEnabled(mModule.getValue("S2")!=-999);
+		btUVB.setEnabled(mModule.getValue("S3")!=-999);
+		btC75W.setEnabled(mModule.getValue("S4")!=-999);
+		btHMD.setEnabled(mModule.getValue("S5")!=-999);
+		sbFAN.setEnabled(mModule.getValue("S6")!=-999);
+		et_aimh.setEnabled(mModule.getValue("HA")!=-999);
+		et_aimt.setEnabled(mModule.getValue("TA")!=-999);
+
+		btC50W.setChecked(mModule.getValue("S1")==1);
+		btUVA.setChecked(mModule.getValue("S2")==1);
+		btUVB.setChecked(mModule.getValue("S3")==1);
+		btC75W.setChecked(mModule.getValue("S4")==1);
+		btHMD.setChecked(mModule.getValue("S5")==1);
+		if(mModule.getValue("S6")>=0&&mModule.getValue("S6")<=255)
+			sbFAN.setProgress((int)mModule.getValue("S6"));
+		if(mModule.getValue("HA")>=Const.AIMSETTING_MINH
+		 &&mModule.getValue("HA")<=Const.AIMSETTING_MAXH) {
+			et_aimh.setText(""+mModule.getValue("HA"));
+		}
+		if(mModule.getValue("TA")>=Const.AIMSETTING_MINT
+		 &&mModule.getValue("TA")<=Const.AIMSETTING_MAXT) {
+			et_aimt.setText(""+mModule.getValue("TA"));
+		}
+//end 20160204
 		
 		OnClickListener ocl = new OnClickListener() {
 			public void onClick(View v) {
 				if (v.getId() == R.id.btn_dialog_ok) {
 					StringBuilder orderStringBuilder = new StringBuilder();
-					if(btC50W.isChecked()!=mModule.getValue("S1").equals("1")) {
-						mModule.setStatus("WS1", (btC50W.isChecked()?"1":"0"));
+					boolean openFlag = (mModule.getValue("S1")==1);
+					if(btC50W.isChecked()!=openFlag) {
+						mModule.setStatus("WS1", (btC50W.isChecked()?1:0));
 						orderStringBuilder.append("SET+S1="+(btC50W.isChecked()?"1 ":"0 "));
 					}
-					if(btUVA.isChecked()!=mModule.getValue("S2").equals("1")) {
-						mModule.setStatus("WS2", (btUVA.isChecked()?"1":"0"));
+					openFlag = (mModule.getValue("S2")==1);
+					if(btUVA.isChecked()!=openFlag) {
+						mModule.setStatus("WS2", (btUVA.isChecked()?1:0));
 						orderStringBuilder.append("SET+S2="+(btUVA.isChecked()?"1 ":"0 "));
 					}
-					if(btUVB.isChecked()!=mModule.getValue("S3").equals("1")) {
-						mModule.setStatus("WS3", (btUVB.isChecked()?"1":"0"));
+					openFlag = (mModule.getValue("S3")==1);
+					if(btUVB.isChecked()!=openFlag) {
+						mModule.setStatus("WS3", (btUVB.isChecked()?1:0));
 						orderStringBuilder.append("SET+S3="+(btUVB.isChecked()?"1 ":"0 "));
 					}
-					if(btC75W.isChecked()!=mModule.getValue("S4").equals("1")) {
-						mModule.setStatus("WS4", (btC75W.isChecked()?"1":"0"));
+					openFlag = (mModule.getValue("S4")==1);
+					if(btC75W.isChecked()!=openFlag) {
+						mModule.setStatus("WS4", (btC75W.isChecked()?1:0));
 						orderStringBuilder.append("SET+S4="+(btC75W.isChecked()?"1 ":"0 "));
 					}
-					if(btHMD.isChecked()!=mModule.getValue("S5").equals("1")) {
-						mModule.setStatus("WS5", (btHMD.isChecked()?"1":"0"));
+					openFlag = (mModule.getValue("S5")==1);
+					if(btHMD.isChecked()!=openFlag) {
+						mModule.setStatus("WS5", (btHMD.isChecked()?1:0));
 						orderStringBuilder.append("SET+S5="+(btHMD.isChecked()?"1 ":"0 "));
 					}
-					if(sbFAN.getProgress()!=Integer.parseInt(mModule.getValue("S6"))) {
-						mModule.setStatus("WS6", ""+(51*sbFAN.getProgress()));
-						orderStringBuilder.append("SET+S6="+(51*sbFAN.getProgress())+" ");
+					if(sbFAN.getProgress()!=mModule.getValue("S6")) {
+						mModule.setStatus("WS6", (51*sbFAN.getProgress()));
+//at 20160204						orderStringBuilder.append("SET+S6="+(51*sbFAN.getProgress())+" ");
+						orderStringBuilder.append("SET+S6="+(sbFAN.getProgress())+" ");
 					}
-	
-					if(Integer.parseInt(et_aimh.getText().toString())!=
-						Integer.parseInt(mModule.getValue("HA"))) {
-						mModule.setStatus("WHA", et_aimh.getText().toString()); //at 20151214
+					double aimhD=Double.parseDouble(et_aimh.getText().toString());
+					if(aimhD!= mModule.getValue("HA")) {
+						mModule.setStatus("WHA", aimhD);
 						orderStringBuilder.append("SET+HA="+et_aimh.getText()+" ");
 					}
-					if(Integer.parseInt(et_aimt.getText().toString())!=
-								Integer.parseInt(mModule.getValue("TA"))) {
-						mModule.setStatus("WTA", et_aimt.getText().toString()); //at 20151214
+					double aimtD=Double.parseDouble(et_aimt.getText().toString());
+					if(aimtD!= mModule.getValue("TA")) {
+						mModule.setStatus("WTA", aimtD);
 						orderStringBuilder.append("SET+TA="+et_aimt.getText()+" ");
 					}
 					orderStringBuilder.append("SET+F=300");

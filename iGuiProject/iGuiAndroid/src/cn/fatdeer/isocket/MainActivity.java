@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import cn.fatdeer.isocket.apmode.UDPHelper;
 import cn.fatdeer.isocket.apmode.WifiActivity;
 import cn.fatdeer.isocket.chart.iGuiDBHelper;
 import cn.fatdeer.isocket.entity.Login;
@@ -124,6 +125,9 @@ import cn.fatdeer.isocket.pub.DoJson;
  *            1. fix bug: display of hourclass;  
  *           at 20160107
  *            1. remove clickedPosition, unlock icon according module's status;
+ *           at 20160204
+ *            1. new function send2Server() for UDP connection ;
+ *            2. AIMSETTINGDIALOG send USRAIM order to Server;
  * 
  */
 public class MainActivity extends Activity implements OnClickListener {
@@ -156,14 +160,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	private List<Module> modules;
 	private ListView lvModules;
 	private BaseAdapter moduleAdapt;
-//    private ProgressDialog progressDialog;
-	//at 20151124
     int lastPosition=-1;
-//	int[] resImags = { R.drawable.lockedon,R.drawable.unlockon,
-//			R.drawable.lockedoff,R.drawable.unlockoff,
-//			R.drawable.hourclass //at 20151126
-//	};
-    //end 20151124
+    int thisPosition=-1; //at 20160204
+
     String userlistDelim = "!"; //at 20151130
 //at 20160107    int clickedPosition=-1; //at 20151211
     
@@ -255,8 +254,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		CLog.i(tag, "Enter onResume(MainActivity)");
 		regBroadcast();
 		new LoginDialog(s_context,login,Const.whichActivity.MAIN).showLoginDialog();
-		
-//tmpmod		new AimSettingDialog(s_context,login.getName(), null, //tmpmod modules.get(position),
+//tmpmod
+//		new AimSettingDialog(s_context,login.getName(), modules.get(thisPosition),
 //				Const.whichActivity.MAIN).showDialog();
 		super.onResume();
 
@@ -353,15 +352,29 @@ public class MainActivity extends Activity implements OnClickListener {
 				while (st.countTokens() > 0) {
 					String status_snap = st.nextElement().toString();
 					String name = status_snap.split("=")[0];
-					String value = status_snap.split("=")[1];
-					if (!value.equals("NAN")) {
+//at 20160204					String value = status_snap.split("=")[1];
+					double value;
+					try {
+						value = Double.parseDouble(status_snap
+								.split("=")[1]);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+
+						Log.e(tag,
+								"SET Order's Values ERROR : Exception: "
+										+ e.getMessage());
+						continue;
+					}
+//					if (!value.equals("NAN")) {
 						if (name.equals("S1") || name.equals("S2")
 						 || name.equals("S3") || name.equals("S4")
 						 || name.equals("S5") || name.equals("S6")
 						 || name.equals("HA") || name.equals("TA")) {
-							String wantedValue = module.getValue("W" + name);
-							if (wantedValue != null
-									&& !value.equals(wantedValue)) {
+							double wantedValue = module.getValue("W" + name);
+							if (wantedValue != -999
+//							&& !value.equals(wantedValue)) {
+							&& value!=wantedValue) {
 								CLog.i(tag, "module in orderControl:name="
 										+ name + ":" + wantedValue + "<>"
 										+ value);
@@ -371,7 +384,9 @@ public class MainActivity extends Activity implements OnClickListener {
 							}
 						}
 						module.setStatus(name, value);
-					}
+//					}
+	//end 20160204					
+						
 				}
 				if (inOrderControl) {
 // at 20151214 module.setWaiting();
@@ -401,8 +416,8 @@ public class MainActivity extends Activity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				//at 20151124
 				lastPosition=position;
+				thisPosition=-1; //at 20160204
 				if(position==0) {
 					image_tortoise.setImageResource(R.drawable.sulcata);
 				} else if(position==1) {
@@ -412,18 +427,19 @@ public class MainActivity extends Activity implements OnClickListener {
 				} else if(position==3) {
 					image_tortoise.setImageResource(R.drawable.genoa);
 				}
-
-				if(modules.get(position).isInOrder()) {
-					showMsg("让子弹飞一会儿", 0);
-				}
-				else if(modules.get(position).isLocked()) {
-					showMsg("请先长按解锁", 0);
-				} 
-				else {
+//tmpmod
+//				if(modules.get(position).isInOrder()) {
+//					showMsg("让子弹飞一会儿", 0);
+//				}
+//				else if(modules.get(position).isLocked()) {
+//					showMsg("请先长按解锁", 0);
+//				} 
+//				else {
 					//open dialog for deployment
 					new DeployDialog(s_context,login.getName(),modules.get(position),
 							Const.whichActivity.MAIN).showLoginDialog();
-				}
+					thisPosition=position; //at 20160204
+//				}
 
 			
 			}
@@ -485,7 +501,6 @@ public class MainActivity extends Activity implements OnClickListener {
 					this.showMsg(login.toString(), 1);
 					setSharePrefrence();
 					initNetWork();
-//					initUI();
 				} else if (request.indexOf("R_DIALOG") == 0) { // From RegisterDialog
 					new LoginDialog(s_context, login,Const.whichActivity.MAIN).showLoginDialog();
 				} else if(request.indexOf("DEPLOYDIALOG")==0) {
@@ -497,14 +512,18 @@ public class MainActivity extends Activity implements OnClickListener {
 						if (mSockOutputThread != null) {
 							mSockOutputThread.addMsgToSendList(msgEntity);
 						}
-						if(moduleAdapt!=null) moduleAdapt.notifyDataSetChanged();//at 20151211
-//at 20151203					} catch (UnsupportedEncodingException e) {
+						if(moduleAdapt!=null) moduleAdapt.notifyDataSetChanged();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 						this.showMsg("Send order error:"+order+userlistDelim+request, -1);
 					}
+//at 20160204					
+				} else if(request.indexOf("AIMSETTINGDIALOG")==0) {
+					String orderStr = request.split(userlistDelim)[1];
+					this.showMsg(orderStr, -1);
+					send2Server(orderStr);
 				}
+//end 20160204				
 			} else if (order.equals("REGISTER") && request.equals("DIALOG")) {
 				//Open WifiActivity for deployment of module
 				this.initModule("REG");
@@ -523,8 +542,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			//at 20160202
 			else if (order.equals("EXPERT") && request.equals("DIALOG")) {
-				new AimSettingDialog(s_context, login.getName(), null, // tmpmod
-																		// modules.get(position),
+				new AimSettingDialog(s_context, login.getName(), modules.get(thisPosition),
 						Const.whichActivity.MAIN).showDialog();
 			}
 			//end 20160202
@@ -534,26 +552,11 @@ public class MainActivity extends Activity implements OnClickListener {
 			// Display The Message of Receive
 			this.showMsg("RCV[" + df.format(new Date()) + "]" +order + userlistDelim + response,-1);
 			if(order.equals("WARN")) {
-//				initUI();
 			} else if(order.equals("ERROR")) {
 				this.closeNetWork();
 				new LoginDialog(s_context,login,Const.whichActivity.MAIN).showLoginDialog();
 			}
 			if (order.equals("SEND")) {
-//at 20160107				
-				//at 20151211
-//				if(response.indexOf("SUCC:ORDER=SET+F")==0) {
-//					modules.get(clickedPosition).setLocked(false);
-////at 20151214					modules.get(clickedPosition).setImage();
-//					modules.get(clickedPosition).setInOrder(false);
-//					modules.get(clickedPosition).setModTimes();//at 20151202
-//					CLog.i(tag, "module=" + modules.get(clickedPosition).toString());
-//					if (moduleAdapt != null)
-//						moduleAdapt.notifyDataSetChanged();
-//					clickedPosition=-1;
-//				} else 
-				//end 20151211
-//end 20160107				
 				this.updListView(response);
 			}
 			if (order.equals("USERLIST")) {
@@ -570,7 +573,6 @@ public class MainActivity extends Activity implements OnClickListener {
 						mSockHeartThread = new TCPHeartThread(login);
 				}
 				initListView();
-//				initUI();
 			}
 
 			if(sendStr!=null) {
@@ -743,5 +745,47 @@ public class MainActivity extends Activity implements OnClickListener {
 			return sSets;
 		}
 	//end 20151130
+// at 20160204
+	private void send2Server(final String sendStr) {
+		showMsg("Send init:" + sendStr, -1);
+		Thread udpThread = new Thread() {
+			@Override
+			public void run() {
+				try {
+					super.run();
+					UDPHelper udphelper = new UDPHelper(
+							login.getHostIP(), login.getUDPPort(),
+							login.getName());
+					if (udphelper.openSocket()) {
+						udphelper.sendMessage(sendStr);
+						String rtnStr = udphelper.rcvMessage();
+						Log.i(tag, "rtnStr:" + rtnStr);
+						if (rtnStr != null && rtnStr.length() > 0
+								&& rtnStr.indexOf("SUCC") >= 0) {
+							CLog.i(tag, "Initialize to Server success");
+							Const.broadCastToActivity("INIT", null, "SUCC",
+									Const.whichActivity.WIFI);
+						} else {
+							CLog.i(tag, "Initialize to Server fail");
+							Const.broadCastToActivity("ERROR", null,
+									"Server Connect fail",
+									Const.whichActivity.WIFI);
+						}
+						CLog.i(tag, "Ready to close UDP Socket");
+						udphelper.closeSocket();
+					}
 
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+
+					Log.e(tag,
+							"send2Server():Connection Exception: "
+									+ e.getMessage());
+				}
+			}
+		};
+		udpThread.start();
+	}
+//end 20160204	
 }
