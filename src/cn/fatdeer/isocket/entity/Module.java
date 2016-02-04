@@ -32,6 +32,8 @@ import cn.fatdeer.isocket.R;
  *           at 20151214
  *            1. new parameter mInOrder ; 
  *            2. remove function setWaiting(), merge into setImage();
+ *           at 20160204
+ *            1. mStatus's value type from String to Double; 
  * 
  */
 public class Module {
@@ -39,7 +41,8 @@ public class Module {
 	private String mName;
 	private String mNickName; //at 20151126
 	private int mImage;
-	HashMap<String , String> mStatus= new HashMap<String , String>();  
+//at 20160204	HashMap<String , String> mStatus= new HashMap<String , String>();
+	HashMap<String , Double> mStatus= new HashMap<String , Double>();  
 	private int mID; 
 	private boolean mLocked; //If F>0 mLocked is true;
 	private boolean mIsonline; //USERLIST ON then mIsonline is true
@@ -138,7 +141,8 @@ public class Module {
             	if(key.equals(sysParameter.getIndex_code())) {
             		sd.setName(sysParameter.getIndex_name());
             		sd.setIndex(sysParameter.getChart_type()*100+sysParameter.getSer_no());
-            		sd.setValue(mStatus.get(key));
+//at 20160204            		sd.setValue(mStatus.get(key));
+            		sd.setValue(""+mStatus.get(key));
             		sdSets.add(sd);
             		break;
             	}
@@ -157,19 +161,35 @@ public class Module {
 		}
 		return status.toString();
 	}
+//at 20160204
+//	public String getValue(String s) {
+//		String rtn=mStatus.get(s);
+//
+//		if(toStatus.get(s)==null) return -999;
+//		else return toStatus.get(s);
+//		
+//		return rtn;
+//	}
+//	
+//	public void setStatus(String s, String value) {
+//		if (mStatus.get(s) != null) {
+//			mStatus.remove(s);
+//		}
+//		mStatus.put(s, value);
+//	}
 
-	public String getValue(String s) {
-		String rtn=mStatus.get(s);
-		
-		return rtn;
+	public double getValue(String s) {
+		if(mStatus.get(s)==null) return -999;
+		else return mStatus.get(s);
 	}
 	
-	public void setStatus(String s, String value) {
+	public void setStatus(String s, double value) {
 		if (mStatus.get(s) != null) {
 			mStatus.remove(s);
 		}
 		mStatus.put(s, value);
 	}
+//end 20160204	
 //at 20151214
 	public void removeStatus(String s) {
 		if (mStatus.get(s) != null) {
