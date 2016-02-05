@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Handler;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -34,7 +33,12 @@ import cn.fatdeer.isocket.pub.DoJson;
  *            1. UI can work now; 
  *           at 20160202
  *            1. spinner_animal for user choose what kind of animal; 
- *            2. query aim value from SQLite; 
+ *            2. query aim value from SQLite;
+ *           at 20160205
+ *            1. chosenTimeZone begin from zero;
+ *            2. query sys_value_aim when sys_index_aim; 
+ *            3. init aim values after Dialog is build; 
+ *            4. new parameter inInit for spinner onChanged overwrite user's values;
  *           
  */
 public class AimSettingDialog implements OnSeekBarChangeListener{
@@ -50,53 +54,48 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 	private EditText et_aimt3;
 	private EditText et_aimh3;
 	
-	Context mContext=null;
-	Module mModule =null;
-	String mName =null;
-	Handler mHandler = null;
-	private whichActivity mActivity;
+	Context mContext=null; // holder of MainActivity's Context
+	Module mModule =null; // module of User clicked
+	String mName =null; // who use this APP
+//	Handler mHandler = null;
+	private whichActivity mActivity;// holder of MainActivity's
 	private Button btn_lastclicked;
-	private EditText et_focus;
-	private boolean setHumidity = false;
-//	int MIN_TEMPERATURE = 20;
-//	int MIN_HUMIDITY = 50;
-//	int[] codes =  {1,2,3,4};
-	String[] names ; //= {"印度星","苏卡达","辐射","豹纹" };
-	private ArrayAdapter<String> adapter;
-	//2 - 12 - 3
-//	private int[][][] aimValue = {
-//			{ 	{ 1, 27, 60 }, { 1, 26, 62 }, { 1, 25, 64 }, 
-//				{ 1, 26, 68 }, { 1, 28, 70 }, { 1, 30, 72 }, 
-//				{ 1, 31, 74 }, { 1, 32, 76 }, { 1, 31, 78 }, 
-//				{ 1, 30, 74 }, { 1, 29, 68 }, { 1, 28, 64 } },
-//			{ 	{ 2, 37, 50 }, { 2, 36, 52 }, { 2, 35, 54 }, 
-//				{ 2, 36, 58 }, { 2, 38, 60 }, { 2, 40, 62 }, 
-//				{ 2, 41, 64 }, { 2, 42, 66 }, { 2, 41, 68 }, 
-//				{ 2, 40, 64 }, { 2, 39, 58 }, { 2, 38, 54 } },
-//			{ 	{ 3, 47, 40 }, { 3, 36, 42 }, { 3, 35, 44 }, 
-//				{ 3, 36, 48 }, { 3, 48, 50 }, { 3, 40, 52 }, 
-//				{ 3, 41, 54 }, { 3, 42, 56 }, { 3, 51, 58 }, 
-//				{ 3, 40, 54 }, { 3, 39, 48 }, { 3, 38, 44 } },
-//			{ 	{ 4, 57, 30 }, { 4, 56, 32 }, { 4, 55, 34 }, 
-//				{ 4, 56, 38 }, { 4, 58, 40 }, { 4, 50, 42 }, 
-//				{ 4, 61, 44 }, { 4, 62, 46 }, { 4, 61, 48 }, 
-//				{ 4, 60, 44 }, { 4, 59, 38 }, { 4, 58, 34 } } 
-//	};
-	private int chosenAnimal=0;
-	private int chosenTimeZone=1;
-	private int chosenValue=0;
-	private final static int valueNum=24; // how many value send to Server
-	private int[] modified = new int[valueNum];
+	private EditText et_focus; // which EditText(AimValues) is focused
+	private boolean setHumidity = false; // is this focused EditText Humidity?
+	String[] names ; // animal's name for spinner
+	private ArrayAdapter<String> adapter; // adapter for spinner
 
-	public AimSettingDialog(Context context,String name, Module module,whichActivity activity) {
+	private int chosenAnimal=0;  // which animal user choose
+	private int chosenTimeZone=0; // 4 time zone morning afternoon night dawn
+	private int chosenValue=0; // index of focused EditText
+	private final static int valueNum=24; // how many value send to Server
+	private int[] initValues = new int[valueNum]; // hold 24 aim value
+	private int[] modified = new int[valueNum]; // which value is modified , not modify -999;
+	private boolean inInit=true; //at 20160205
+
+	public AimSettingDialog(Context context,String name, Module module,String values,whichActivity activity) {
 		this.mContext=context;
 		this.mModule=module;
 		this.mName=name;
 		this.mActivity=activity;
 		chosenAnimal=0;
-		chosenTimeZone=1;
+		chosenTimeZone=0;
 		chosenValue=0;
+		inInit=true; //at 20160205
 		for(int i=0;i<valueNum;i++) modified[i]=-999;
+		//at 20160205
+		String[] eachValues=values.split(",");
+		if(eachValues.length!=valueNum) return;
+		for(int i=0;i<valueNum;i++) {
+			try {
+				initValues[i] = Integer.parseInt(eachValues[i]);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.e(tag,
+						"AimSettingDialog():init Values parseInt Error: " + e.getMessage());
+			}
+		}
+		//end 20160205
 		if(Const.DEBUG_FLAG) CLog.i(tag, "AimSettingDialog begin");
 	}
 
@@ -174,25 +173,25 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 					tv_aim1.setText("06:00-08:00");
 					tv_aim2.setText("08:00-10:00");
 					tv_aim3.setText("10:00-12:00");
-					chosenTimeZone=1;
+					chosenTimeZone=0;
 					recolorBtn(btn_morning);
 				} else if (v.getId() == R.id.btn_dialog_afternoon) {
 					tv_aim1.setText("12:00-14:00");
 					tv_aim2.setText("14:00-16:00");
 					tv_aim3.setText("16:00-18:00");
-					chosenTimeZone=2;
+					chosenTimeZone=1;
 					recolorBtn(btn_afternoon);
 				} else if (v.getId() == R.id.btn_dialog_night) {
 					tv_aim1.setText("18:00-20:00");
 					tv_aim2.setText("20:00-22:00");
 					tv_aim3.setText("22:00-24:00");
-					chosenTimeZone=3;
+					chosenTimeZone=2;
 					recolorBtn(btn_night);
 				} else if (v.getId() == R.id.btn_dialog_dawn) {
 					tv_aim1.setText("00:00-02:00");
 					tv_aim2.setText("02:00-04:00");
 					tv_aim3.setText("04:00-06:00");
-					chosenTimeZone=4;
+					chosenTimeZone=3;
 					recolorBtn(btn_dawn);
 				} else
 				if (v.getId() == R.id.btn_dialog_ok) {
@@ -237,8 +236,46 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 	class SpinnerSelectedListener implements OnItemSelectedListener {
 		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 				long arg3) {
+			Log.i(tag, "inInit="+inInit+";arg2=" + arg2 +";arg3=" + arg3 + "\n");
+
 			chosenAnimal=arg2;
+//at 20160205			refreshValues();
+			if (!inInit) { // at 20160205
+				iGuiDBHelper dbHelper = new iGuiDBHelper(mContext, "igui.db",
+						null, 1);
+				SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+				for (int i = 0; i < 4; i++) {
+					Cursor cursor = db.rawQuery(
+							"SELECT aimt_1,aimh_1,aimt_2,aimh_2,aimt_3,aimh_3 FROM sys_index_aim "
+									+ "where box_name=? and hour_name=?",
+							new String[] { names[chosenAnimal], (i + 1) + "" });
+
+					if (cursor.moveToNext()) {
+						initValues[i * 6 + 0] = cursor.getInt(cursor
+								.getColumnIndex("aimt_1"));
+						initValues[i * 6 + 1] = cursor.getInt(cursor
+								.getColumnIndex("aimh_1"));
+						initValues[i * 6 + 2] = cursor.getInt(cursor
+								.getColumnIndex("aimt_2"));
+						initValues[i * 6 + 3] = cursor.getInt(cursor
+								.getColumnIndex("aimh_2"));
+						initValues[i * 6 + 4] = cursor.getInt(cursor
+								.getColumnIndex("aimt_3"));
+						initValues[i * 6 + 5] = cursor.getInt(cursor
+								.getColumnIndex("aimh_3"));
+					}
+					cursor.close();
+				}
+				db.close();
+			}
+
+			for(int j=0;j<initValues.length;j++)
+				Log.i(tag, "after spinner changed:initValues["+j+"]:" + initValues[j] + "\n");
 			refreshValues();
+//end 20160205			
+			inInit=false;
+			
 		}
 
 		public void onNothingSelected(AdapterView<?> arg0) {
@@ -253,7 +290,7 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 //		et_aimh2.setText(""+aimValue[chosenAnimal][3*chosenTimeZone+1][2]);
 //		et_aimt3.setText(""+aimValue[chosenAnimal][3*chosenTimeZone+2][1]);
 //		et_aimh3.setText(""+aimValue[chosenAnimal][3*chosenTimeZone+2][2]);
-		int[] aimValues=getAimValue(names[chosenAnimal],chosenTimeZone);
+		int[] aimValues=getAimValue(chosenTimeZone);
 		et_aimt1.setText(""+aimValues[0]);
 		et_aimh1.setText(""+aimValues[1]);
 		et_aimt2.setText(""+aimValues[2]);
@@ -275,6 +312,7 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 		}
 
 		thisET.setInputType(InputType.TYPE_NULL); // close software keyboard
+		
 	}
 
 	@Override
@@ -287,7 +325,7 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 				value=Const.AIMSETTING_MINT+sb.getProgress();
 			}
 			this.et_focus.setText(""+value);
-			modified[Const.NUMINTIMEZONE*(chosenTimeZone-1)+chosenValue]=value;
+			modified[Const.NUMINTIMEZONE*(chosenTimeZone)+chosenValue]=value;
 			
 		}
 		CLog.i(tag, "arg2="+arg2);
@@ -337,32 +375,35 @@ public class AimSettingDialog implements OnSeekBarChangeListener{
 		return result;
 	}
 	
-	private int[] getAimValue(String tortoiseType, int timeZone) {
+	private int[] getAimValue( int timeZone) {
 		int[] result=new int[6];
 
-		iGuiDBHelper dbHelper = new iGuiDBHelper(
-				mContext , "igui.db", null, 1);
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-		Cursor cursor = db
-				.rawQuery(
-				"SELECT aimt_1,aimh_1,aimt_2,aimh_2,aimt_3,aimh_3 FROM sys_index_aim "+
-				"where box_name=? and hour_name=?", 
-						new String[] { tortoiseType, timeZone + ""  });
-		
-		if (cursor.moveToNext()) {
-			result[0] = cursor.getInt(cursor.getColumnIndex("aimt_1"));
-			result[1] = cursor.getInt(cursor.getColumnIndex("aimh_1"));
-			result[2] = cursor.getInt(cursor.getColumnIndex("aimt_2"));
-			result[3] = cursor.getInt(cursor.getColumnIndex("aimh_2"));
-			result[4] = cursor.getInt(cursor.getColumnIndex("aimt_3"));
-			result[5] = cursor.getInt(cursor.getColumnIndex("aimh_3"));
+//		iGuiDBHelper dbHelper = new iGuiDBHelper(
+//				mContext , "igui.db", null, 1);
+//		SQLiteDatabase db = dbHelper.getReadableDatabase();
+//
+//		Cursor cursor = db
+//				.rawQuery(
+//				"SELECT aimt_1,aimh_1,aimt_2,aimh_2,aimt_3,aimh_3 FROM sys_index_aim "+
+//				"where box_name=? and hour_name=?", 
+//						new String[] { tortoiseType, timeZone + ""  });
+//		
+//		if (cursor.moveToNext()) {
+//			result[0] = cursor.getInt(cursor.getColumnIndex("aimt_1"));
+//			result[1] = cursor.getInt(cursor.getColumnIndex("aimh_1"));
+//			result[2] = cursor.getInt(cursor.getColumnIndex("aimt_2"));
+//			result[3] = cursor.getInt(cursor.getColumnIndex("aimh_2"));
+//			result[4] = cursor.getInt(cursor.getColumnIndex("aimt_3"));
+//			result[5] = cursor.getInt(cursor.getColumnIndex("aimh_3"));
+//		}
+//		cursor.close();
+//		db.close();
+//
+//		for(int j=0;j<result.length;j++)
+//			Log.i(tag, "result["+j+"]:" + result[j] + "\n");
+		for(int i=0;i<6;i++) {
+			result[i]=initValues[timeZone*6+i];
 		}
-		cursor.close();
-		db.close();
-
-		for(int j=0;j<result.length;j++)
-			Log.i(tag, "result["+j+"]:" + result[j] + "\n");
 		
 		return result;
 	}

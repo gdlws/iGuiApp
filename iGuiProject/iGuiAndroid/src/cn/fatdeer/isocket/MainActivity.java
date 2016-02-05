@@ -39,6 +39,7 @@ import cn.fatdeer.isocket.apmode.UDPHelper;
 import cn.fatdeer.isocket.apmode.WifiActivity;
 import cn.fatdeer.isocket.chart.iGuiDBHelper;
 import cn.fatdeer.isocket.entity.Login;
+import cn.fatdeer.isocket.entity.Message4JSON;
 import cn.fatdeer.isocket.entity.Module;
 import cn.fatdeer.isocket.entity.MsgEntity;
 import cn.fatdeer.isocket.entity.SysParameter;
@@ -128,6 +129,8 @@ import cn.fatdeer.isocket.pub.DoJson;
  *           at 20160204
  *            1. new function send2Server() for UDP connection ;
  *            2. AIMSETTINGDIALOG send USRAIM order to Server;
+ *           at 20160205
+ *            1. USRAIMALL order for get module's init values;
  * 
  */
 public class MainActivity extends Activity implements OnClickListener {
@@ -532,7 +535,7 @@ public class MainActivity extends Activity implements OnClickListener {
 					this.initModule(login.getName());
 				else
 					this.initModule("REG");
-			}	
+			}
 			else if (order.equals("CLOSE")) {
 				if (request.equals("DIALOG")) {
 					this.exitToSystem();
@@ -542,8 +545,13 @@ public class MainActivity extends Activity implements OnClickListener {
 			}
 			//at 20160202
 			else if (order.equals("EXPERT") && request.equals("DIALOG")) {
-				new AimSettingDialog(s_context, login.getName(), modules.get(thisPosition),
-						Const.whichActivity.MAIN).showDialog();
+//at 20160205				
+				String orderStr=DoJson.instance().toJSon("USRAIMALL", login.getName(),
+						modules.get(thisPosition).getName(), null);
+				send2Server(orderStr);
+//				new AimSettingDialog(s_context, login.getName(), modules.get(thisPosition),
+//						Const.whichActivity.MAIN).showDialog();
+//end 20160205				
 			}
 			//end 20160202
 		}
@@ -555,10 +563,12 @@ public class MainActivity extends Activity implements OnClickListener {
 			} else if(order.equals("ERROR")) {
 				this.closeNetWork();
 				new LoginDialog(s_context,login,Const.whichActivity.MAIN).showLoginDialog();
-			}
+			} 
+			else //at 20160205
 			if (order.equals("SEND")) {
 				this.updListView(response);
-			}
+			} 
+			else //at 20160205 
 			if (order.equals("USERLIST")) {
 				moduleList.clear();
 				String[] sArray = response.split("@");
@@ -574,6 +584,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 				initListView();
 			}
+			//at 20160205
+			else if (order.equals("USRAIMALL")) {
+				Message4JSON msg = DoJson.instance().fromJson(response);
+
+				new AimSettingDialog(s_context, login.getName(), modules.get(thisPosition),msg.getuMSG(),
+						Const.whichActivity.MAIN).showDialog();
+			}			
+			//end 20160205
 
 			if(sendStr!=null) {
 				String compareStr="ORDER={" + sendStr+"}";
@@ -760,16 +778,25 @@ public class MainActivity extends Activity implements OnClickListener {
 						udphelper.sendMessage(sendStr);
 						String rtnStr = udphelper.rcvMessage();
 						Log.i(tag, "rtnStr:" + rtnStr);
-						if (rtnStr != null && rtnStr.length() > 0
-								&& rtnStr.indexOf("SUCC") >= 0) {
-							CLog.i(tag, "Initialize to Server success");
-							Const.broadCastToActivity("INIT", null, "SUCC",
-									Const.whichActivity.WIFI);
+						if (rtnStr != null && rtnStr.length() > 0) {
+							if(rtnStr.indexOf("USRAIMALL")>=0) {
+								// before Open AimSetting Dialog 
+								CLog.i(tag, "USRAIMALL Success");
+								Const.broadCastToActivity("USRAIMALL", null, rtnStr,
+										Const.whichActivity.MAIN);
+								
+							} else if(rtnStr.indexOf("USRAIM")>=0) {
+								// After Send new User's Aim value
+								CLog.i(tag, "USRAIM Success");
+								Const.broadCastToActivity("USRAIM", null, rtnStr,
+										Const.whichActivity.MAIN);
+									
+							}
 						} else {
 							CLog.i(tag, "Initialize to Server fail");
 							Const.broadCastToActivity("ERROR", null,
 									"Server Connect fail",
-									Const.whichActivity.WIFI);
+									Const.whichActivity.MAIN);
 						}
 						CLog.i(tag, "Ready to close UDP Socket");
 						udphelper.closeSocket();
