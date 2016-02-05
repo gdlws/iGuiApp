@@ -1,4 +1,12 @@
-
+ 2016-2-5
+ 1. (MainActivity.java)
+ *            1. USRAIMALL order for get module's init values;
+ 2. (AimSettingDialog.java)
+ *            1. chosenTimeZone begin from zero;
+ *            2. query sys_value_aim when sys_index_aim; 
+ *            3. init aim values after Dialog is build; 
+ *            4. new parameter inInit for spinner onChanged overwrite user's values;
+ 
  2016-2-4
  1. (Module.java)
  *            1. mStatus's value type from String to Double; 
